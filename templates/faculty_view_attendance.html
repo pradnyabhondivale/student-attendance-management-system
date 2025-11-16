@@ -1,0 +1,310 @@
+{% extends "faculty_layout.html" %}
+{% block title %}View Attendance - AttendEase{% endblock %}
+
+{% block content %}
+<style>
+    .page-header {
+        margin-bottom: 2rem;
+    }
+    
+    .page-header h1 {
+        font-size: 2rem;
+        color: #1e293b;
+        margin-bottom: 0.5rem;
+    }
+    
+    .subtitle {
+        color: #64748b;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .subject-badge {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        padding: 0.375rem 1rem;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.875rem;
+    }
+    
+    .tabs {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 2rem;
+        border-bottom: 2px solid #e2e8f0;
+    }
+    
+    .tab {
+        padding: 1rem 2rem;
+        background: none;
+        border: none;
+        font-size: 1rem;
+        font-weight: 600;
+        color: #64748b;
+        cursor: pointer;
+        border-bottom: 3px solid transparent;
+        transition: all 0.3s;
+        text-decoration: none;
+    }
+    
+    .tab.active {
+        color: #667eea;
+        border-bottom-color: #667eea;
+    }
+    
+    .tab:hover {
+        color: #667eea;
+    }
+    
+    .card {
+        background: white;
+        padding: 2rem;
+        border-radius: 16px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    
+    .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 2rem;
+    }
+    
+    .card-header h2 {
+        font-size: 1.25rem;
+        color: #1e293b;
+        margin: 0;
+    }
+    
+    .subject-info {
+        color: #64748b;
+        font-size: 0.95rem;
+        margin-top: 0.5rem;
+    }
+    
+    .export-btn {
+        background: #f0f9ff;
+        color: #0284c7;
+        border: 2px solid #0284c7;
+        padding: 0.625rem 1.25rem;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .export-btn:hover {
+        background: #0284c7;
+        color: white;
+    }
+    
+    .filters {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .form-group label {
+        display: block;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+    }
+    
+    .form-group select {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        font-size: 0.95rem;
+    }
+    
+    .form-group select:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .stat-card {
+        background: #f9fafb;
+        padding: 1.25rem;
+        border-radius: 12px;
+        text-align: center;
+    }
+    
+    .stat-label {
+        font-size: 0.875rem;
+        color: #64748b;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+    
+    .stat-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #1e293b;
+    }
+    
+    .stat-value.blue { color: #3b82f6; }
+    .stat-value.green { color: #10b981; }
+    .stat-value.red { color: #ef4444; }
+    .stat-value.purple { color: #8b5cf6; }
+    
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    th {
+        background: #f9fafb;
+        padding: 1rem;
+        text-align: left;
+        font-weight: 600;
+        color: #374151;
+        border-bottom: 1px solid #e5e7eb;
+        font-size: 0.9rem;
+    }
+    
+    td {
+        padding: 1rem;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    
+    tr:hover {
+        background: #f9fafb;
+    }
+    
+    .percentage-badge {
+        padding: 0.375rem 0.875rem;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.875rem;
+    }
+    
+    .percentage-badge.high {
+        background: #d1fae5;
+        color: #065f46;
+    }
+    
+    .percentage-badge.medium {
+        background: #fef3c7;
+        color: #92400e;
+    }
+    
+    .percentage-badge.low {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+</style>
+
+<div class="page-header">
+    <h1>Mark & View Attendance</h1>
+    <p class="subtitle">
+        Subject: <span class="subject-badge">{{ faculty_subject }}</span>
+    </p>
+</div>
+
+<div class="tabs">
+    <a href="{{ url_for('faculty_mark_attendance') }}" class="tab">
+        <i class="fas fa-clipboard-check"></i> Mark Attendance
+    </a>
+    <a href="{{ url_for('faculty_view_attendance') }}" class="tab active">
+        <i class="fas fa-chart-line"></i> View Attendance
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <div>
+            <h2>Class Attendance Records</h2>
+            <p class="subject-info">Subject: <strong>{{ faculty_subject }}</strong></p>
+        </div>
+    </div>
+    
+    <div class="filters">
+        <div class="form-group">
+            <label>Select Class</label>
+            <select onchange="window.location.href='{{ url_for('faculty_view_attendance') }}?class=' + this.value">
+                {% for cls in classes %}
+                <option value="{{ cls.class_name }}" {% if cls.class_name == selected_class %}selected{% endif %}>
+                    {{ cls.class_name }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+    
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-label">Total Classes</div>
+            <div class="stat-value blue">{{ total_classes }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Avg Attendance</div>
+            <div class="stat-value green">{{ avg_attendance }}%</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Below 75%</div>
+            <div class="stat-value red">{{ below_75 }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Perfect</div>
+            <div class="stat-value purple">{{ perfect }}</div>
+        </div>
+    </div>
+    
+    {% if students|length > 0 %}
+    <table>
+        <thead>
+            <tr>
+                <th>Roll No</th>
+                <th>Student Name</th>
+                <th>Total Days</th>
+                <th>Present</th>
+                <th>Absent</th>
+                <th>Percentage</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for student in students %}
+            <tr>
+                <td>{{ student.roll_number or 'N/A' }}</td>
+                <td>{{ student.full_name }}</td>
+                <td>{{ student.total_days }}</td>
+                <td style="color: #10b981; font-weight: 600;">{{ student.present }}</td>
+                <td style="color: #ef4444; font-weight: 600;">{{ student.absent }}</td>
+                <td>
+                    {% if student.percentage >= 75 %}
+                    <span class="percentage-badge high">{{ student.percentage|int }}%</span>
+                    {% elif student.percentage >= 60 %}
+                    <span class="percentage-badge medium">{{ student.percentage|int }}%</span>
+                    {% else %}
+                    <span class="percentage-badge low">{{ student.percentage|int }}%</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div style="text-align: center; color: #64748b; padding: 3rem;">
+        <i class="fas fa-users-slash" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+        <p style="font-size: 1.1rem; font-weight: 600;">No attendance records found for this class</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,154 @@
+{% extends "layout.html" %}
+{% block title %}Attendance History{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="fas fa-history"></i> Attendance History</h1>
+    <p class="subtitle">Review and filter your complete attendance records</p>
+</div>
+
+<!-- Stats Overview -->
+<div class="stats-grid" style="margin-bottom: 2rem;">
+    <div class="stat-card">
+        <div class="stat-icon" style="background: #dbeafe; color: #3b82f6;">
+            <i class="fas fa-calendar-check"></i>
+        </div>
+        <div class="stat-info">
+            <h3>Total Records</h3>
+            <div class="stat-number">{{ records|length }}</div>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon" style="background: #d1fae5; color: #10b981;">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="stat-info">
+            <h3>Present</h3>
+            <div class="stat-number">{{ records|selectattr('status', 'equalto', 'Present')|list|length }}</div>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon" style="background: #fee2e2; color: #dc2626;">
+            <i class="fas fa-times-circle"></i>
+        </div>
+        <div class="stat-info">
+            <h3>Absent</h3>
+            <div class="stat-number">{{ records|selectattr('status', 'equalto', 'Absent')|list|length }}</div>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon" style="background: #fef3c7; color: #f59e0b;">
+            <i class="fas fa-clock"></i>
+        </div>
+        <div class="stat-info">
+            <h3>On Leave</h3>
+            <div class="stat-number">{{ records|selectattr('status', 'equalto', 'Leave')|list|length }}</div>
+        </div>
+    </div>
+</div>
+
+<!-- Filters Card -->
+<div class="card" style="margin-bottom: 1.5rem;">
+    <h2 style="margin-bottom: 1.5rem;"><i class="fas fa-filter"></i> Filter Records</h2>
+    
+    <form method="GET" class="filters" style="background: transparent; padding: 0;">
+        <div style="flex: 1; min-width: 200px;">
+            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #374151; font-size: 0.85rem;">
+                <i class="fas fa-book"></i> Subject
+            </label>
+            <select name="subject" style="width: 100%; padding: 0.75rem; border: 2px solid #e5e7eb; border-radius: 8px; background: #f8fafc;">
+                <option value="">All</option>
+                {% for subject in subjects %}
+                <option value="{{ subject }}" {% if request.args.get('subject') == subject %}selected{% endif %}>{{ subject }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div style="flex: 1; min-width: 200px;">
+            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #374151; font-size: 0.85rem;">
+                <i class="fas fa-calendar"></i> Start Date
+            </label>
+            <input type="date" name="start_date" value="{{ request.args.get('start_date', '') }}"
+                   style="width: 100%; padding: 0.75rem; border: 2px solid #e5e7eb; border-radius: 8px; background: #f8fafc;">
+        </div>
+        
+        <div style="flex: 1; min-width: 200px;">
+            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #374151; font-size: 0.85rem;">
+                <i class="fas fa-calendar"></i> End Date
+            </label>
+            <input type="date" name="end_date" value="{{ request.args.get('end_date', '') }}"
+                   style="width: 100%; padding: 0.75rem; border: 2px solid #e5e7eb; border-radius: 8px; background: #f8fafc;">
+        </div>
+        
+        <div style="flex: 1; min-width: 200px;">
+            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #374151; font-size: 0.85rem;">
+                <i class="fas fa-check-square"></i> Status
+            </label>
+            <select name="status" style="width: 100%; padding: 0.75rem; border: 2px solid #e5e7eb; border-radius: 8px; background: #f8fafc;">
+                <option value="">All Status</option>
+                <option value="Present" {% if request.args.get('status') == 'Present' %}selected{% endif %}>Present</option>
+                <option value="Absent" {% if request.args.get('status') == 'Absent' %}selected{% endif %}>Absent</option>
+                <option value="Leave" {% if request.args.get('status') == 'Leave' %}selected{% endif %}>Leave</option>
+            </select>
+        </div>
+        
+        <div style="display: flex; gap: 0.5rem; align-items: flex-end;">
+            <button type="submit" class="btn" style="padding: 0.75rem 1.5rem;">
+                <i class="fas fa-search"></i> Filter
+            </button>
+            <a href="{{ url_for('attendance_history') }}" class="btn" 
+               style="padding: 0.75rem 1.5rem; background: #6b7280; text-decoration: none; display: inline-block;">
+                <i class="fas fa-redo"></i> Reset
+            </a>
+        </div>
+    </form>
+</div>
+
+<!-- Attendance Table -->
+<div class="data-table">
+    <table>
+        <thead>
+            <tr>
+                <th><i class="fas fa-calendar-day"></i> Date</th>
+                <th><i class="fas fa-book"></i> Subject</th>
+                <th><i class="fas fa-chalkboard-teacher"></i> Faculty</th>
+                <th><i class="fas fa-clock"></i> Time</th>
+                <th><i class="fas fa-check-circle"></i> Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if records %}
+                {% for record in records %}
+                <tr>
+                    <td style="font-weight: 600;">{{ record.date }}</td>
+                    <td>{{ record.subject }}</td>
+                    <td style="color: #64748b;">{{ record.faculty or 'N/A' }}</td>
+                    <td style="color: #64748b;">{{ record.time or '10:00 AM' }}</td>
+                    <td>
+                        <span class="status-badge {{ record.status.lower() }}">
+                            {% if record.status == 'Present' %}
+                                <i class="fas fa-check"></i>
+                            {% elif record.status == 'Absent' %}
+                                <i class="fas fa-times"></i>
+                            {% else %}
+                                <i class="fas fa-exclamation"></i>
+                            {% endif %}
+                            {{ record.status }}
+                        </span>
+                    </td>
+                </tr>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td colspan="5" class="no-data">
+                        <i class="fas fa-inbox" style="font-size: 3rem; color: #cbd5e1; margin-bottom: 1rem;"></i>
+                        <p>No attendance records found</p>
+                    </td>
+                </tr>
+            {% endif %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

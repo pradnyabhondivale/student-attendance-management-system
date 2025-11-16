@@ -1,0 +1,174 @@
+{% extends "faculty_layout.html" %}
+{% block title %}Send Notice - AttendEase{% endblock %}
+
+{% block content %}
+<style>
+    .page-header {
+        margin-bottom: 2rem;
+    }
+    
+    .page-header h1 {
+        font-size: 2rem;
+        color: #1e293b;
+        margin-bottom: 0.5rem;
+    }
+    
+    .subtitle {
+        color: #64748b;
+    }
+    
+    .card {
+        background: white;
+        padding: 2.5rem;
+        border-radius: 16px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        max-width: 800px;
+    }
+    
+    .form-group {
+        margin-bottom: 1.75rem;
+    }
+    
+    .form-group label {
+        display: block;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 0.5rem;
+        font-size: 0.95rem;
+    }
+    
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        width: 100%;
+        padding: 0.875rem;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        font-family: inherit;
+    }
+    
+    .form-group textarea {
+        resize: vertical;
+        min-height: 150px;
+    }
+    
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    
+    .help-text {
+        font-size: 0.875rem;
+        color: #64748b;
+        margin-top: 0.5rem;
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: flex-end;
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 1px solid #e5e7eb;
+    }
+    
+    .btn {
+        padding: 0.875rem 2rem;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+    
+    .btn-secondary {
+        background: white;
+        color: #64748b;
+        border: 2px solid #e2e8f0;
+    }
+    
+    .btn-secondary:hover {
+        background: #f9fafb;
+    }
+    
+    .info-box {
+        background: #f0f9ff;
+        border-left: 4px solid #0284c7;
+        padding: 1.25rem;
+        border-radius: 8px;
+        margin-bottom: 2rem;
+    }
+    
+    .info-box p {
+        color: #0c4a6e;
+        font-size: 0.95rem;
+        margin: 0;
+    }
+</style>
+
+<div class="page-header">
+    <h1>Send Notice</h1>
+    <p class="subtitle">Send announcements and updates to students</p>
+</div>
+
+<div class="card">
+    <div class="info-box">
+        <p><i class="fas fa-info-circle"></i> <strong>Note:</strong> This notice will be visible to all students in their dashboard.</p>
+    </div>
+    
+    <form method="POST">
+        <div class="form-group">
+            <label for="subject">Subject/Course <span style="color: #ef4444;">*</span></label>
+            <select name="subject" id="subject" required>
+                <option value="">-- Select Subject --</option>
+                <option value="Data Structures">Data Structures</option>
+                <option value="Algorithms">Algorithms</option>
+                <option value="Databases">Databases</option>
+                <option value="Networking">Networking</option>
+                <option value="Operating Systems">Operating Systems</option>
+                <option value="General">General Announcement</option>
+            </select>
+            <p class="help-text">Choose the subject this notice relates to</p>
+        </div>
+        
+        <div class="form-group">
+            <label for="title">Notice Title <span style="color: #ef4444;">*</span></label>
+            <input type="text" name="title" id="title" placeholder="e.g., Assignment Deadline Extended" required maxlength="200">
+            <p class="help-text">Brief title for the notice (max 200 characters)</p>
+        </div>
+        
+        <div class="form-group">
+            <label for="content">Notice Content <span style="color: #ef4444;">*</span></label>
+            <textarea name="content" id="content" placeholder="Enter detailed notice content here..." required maxlength="1000"></textarea>
+            <p class="help-text">Detailed information for students (max 1000 characters)</p>
+        </div>
+        
+        <div class="action-buttons">
+            <a href="{{ url_for('faculty_dashboard') }}" class="btn btn-secondary">
+                <i class="fas fa-times"></i> Cancel
+            </a>
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-paper-plane"></i> Send Notice
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

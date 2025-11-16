@@ -1,0 +1,109 @@
+{% extends "layout.html" %}
+{% block title %}Student Dashboard{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <header class="dashboard-header">
+        <div>
+            <h1>Hello {{ session.user_name.split()[0] }}, welcome back!</h1>
+            <p class="subtitle">Here is your attendance snapshot for today, {{ current_date }}.</p>
+        </div>
+    </header>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon" style="background: var(--primary-light); color: var(--primary-color);">
+                <i class="fas fa-calendar-check"></i>
+            </div>
+            <div class="stat-info">
+                <h3>Total Classes</h3>
+                <p class="stat-number">{{ total_days }}</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="background: #d1fae5; color: var(--success-color);">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="stat-info">
+                <h3>Present</h3>
+                <p class="stat-number">{{ present_days }}</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="background: #fee2e2; color: var(--danger-color);">
+                <i class="fas fa-times-circle"></i>
+            </div>
+            <div class="stat-info">
+                <h3>Absent</h3>
+                <p class="stat-number">{{ absent_days }}</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="background: #fef3c7; color: var(--warning-color);">
+                <i class="fas fa-exclamation-circle"></i>
+            </div>
+            <div class="stat-info">
+                <h3>On Leave</h3>
+                <p class="stat-number">{{ leave_days }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="two-column-layout">
+        <div class="card">
+            <h2>Overall Attendance</h2>
+            <div class="attendance-circle">
+                <svg width="200" height="200" viewBox="0 0 200 200">
+                    <circle cx="100" cy="100" r="80" fill="none" stroke="#e2e8f0" stroke-width="20"/>
+                    <circle cx="100" cy="100" r="80" fill="none" stroke="var(--primary-color)" stroke-width="20"
+                            stroke-dasharray="{{ attendance_percentage * 5.026 }} 502.6" 
+                            stroke-linecap="round" transform="rotate(-90 100 100)"/>
+                </svg>
+                <div class="percentage-text">
+                    <h3>{{ attendance_percentage }}%</h3>
+                    <p>Attendance</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Subject-wise Performance</h2>
+            <div class="subject-list">
+                {% for subject in subject_performance %}
+                <div class="subject-item">
+                    <div class="subject-details">
+                        <h4>{{ subject.name }}</h4>
+                        <p>{{ subject.percentage }}% attendance</p>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: {{ subject.percentage }}%;"></div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>Notice Board</h2>
+        <div class="notice-list">
+            {% if notices %}
+                {% for notice in notices %}
+                <div class="notice-item">
+                    <div class="notice-icon">
+                        <i class="fas fa-bullhorn"></i>
+                    </div>
+                    <div class="notice-content">
+                        <h4>{{ notice.title }}</h4>
+                        <p>{{ notice.content }}</p>
+                        <span class="notice-date">{{ notice.created_at }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p class="no-data">No notices at the moment.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

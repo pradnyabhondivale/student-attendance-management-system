@@ -1,0 +1,99 @@
+{% extends "layout.html" %}
+{% block title %}My Profile{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="fas fa-user-circle"></i> My Profile</h1>
+    <p class="subtitle">Manage your personal information and account security</p>
+</div>
+
+<div class="profile-grid">
+    <!-- Profile Sidebar -->
+    <div class="card profile-sidebar">
+        <div class="profile-avatar">
+            {{ user.full_name[0].upper() }}
+        </div>
+        <h2 style="margin-bottom: 0.5rem; font-size: 1.5rem;">{{ user.full_name }}</h2>
+        <p style="color: #64748b; margin-bottom: 1rem;">{{ user.email }}</p>
+        <div style="display: inline-block; padding: 0.5rem 1rem; background: #dbeafe; color: #3b82f6; border-radius: 20px; font-weight: 600; font-size: 0.85rem;">
+            <i class="fas fa-user-graduate"></i> Student
+        </div>
+        
+        <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid #e5e7eb;">
+            <div style="text-align: left; margin-bottom: 1rem;">
+                <p style="font-size: 0.8rem; color: #94a3b8; margin-bottom: 0.25rem;">MEMBER SINCE</p>
+                <p style="font-weight: 600; color: #1e293b;">September 2024</p>
+            </div>
+            <div style="text-align: left;">
+                <p style="font-size: 0.8rem; color: #94a3b8; margin-bottom: 0.25rem;">STATUS</p>
+                <p style="font-weight: 600; color: #10b981;"><i class="fas fa-circle" style="font-size: 0.5rem;"></i> Active</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Profile Main Content -->
+    <div>
+        <!-- Personal Information Card -->
+        <div class="card" style="margin-bottom: 1.5rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h2 style="margin: 0;"><i class="fas fa-id-card"></i> Personal Information</h2>
+                <span style="background: #f1f5f9; padding: 0.5rem 1rem; border-radius: 6px; font-size: 0.85rem; color: #64748b;">
+                    <i class="fas fa-shield-alt"></i> Secure
+                </span>
+            </div>
+            
+            <form method="POST" action="{{ url_for('update_profile') }}">
+                <div class="form-group">
+                    <label><i class="fas fa-user"></i> Full Name</label>
+                    <input type="text" name="full_name" value="{{ user.full_name }}" required 
+                           style="background: #f8fafc; border: 2px solid #e5e7eb;">
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-envelope"></i> Email Address</label>
+                    <input type="email" name="email" value="{{ user.email }}" required
+                           style="background: #f8fafc; border: 2px solid #e5e7eb;">
+                </div>
+                
+                <button type="submit" class="btn" style="width: 100%;">
+                    <i class="fas fa-save"></i> Update Profile
+                </button>
+            </form>
+        </div>
+        
+        <!-- Change Password Card -->
+        <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h2 style="margin: 0;"><i class="fas fa-lock"></i> Change Password</h2>
+                <span style="background: #fef3c7; padding: 0.5rem 1rem; border-radius: 6px; font-size: 0.85rem; color: #92400e;">
+                    <i class="fas fa-exclamation-triangle"></i> Security
+                </span>
+            </div>
+            
+            <form method="POST" action="{{ url_for('update_password') }}">
+                <div class="form-group">
+                    <label><i class="fas fa-key"></i> Current Password</label>
+                    <input type="password" name="current_password" required
+                           style="background: #f8fafc; border: 2px solid #e5e7eb;">
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-lock"></i> New Password</label>
+                    <input type="password" name="new_password" required
+                           style="background: #f8fafc; border: 2px solid #e5e7eb;">
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-lock"></i> Confirm New Password</label>
+                    <input type="password" name="confirm_new_password" required
+                           style="background: #f8fafc; border: 2px solid #e5e7eb;">
+                </div>
+                
+                <button type="submit" class="btn" style="width: 100%; background: #dc2626;">
+                    <i class="fas fa-sync-alt"></i> Change Password
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

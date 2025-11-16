@@ -1,0 +1,549 @@
+{% extends "admin_layout.html" %}
+{% block title %}Reports & Notifications{% endblock %}
+
+{% block content %}
+<style>
+.page-header {
+    margin-bottom: 2rem;
+}
+
+.page-header h1 {
+    font-size: 2rem;
+    color: #1e293b;
+    margin-bottom: 0.5rem;
+}
+
+.page-header p {
+    color: #64748b;
+}
+
+.tabs {
+    display: flex;
+    gap: 1rem;
+    border-bottom: 2px solid #e5e7eb;
+    margin-bottom: 2rem;
+}
+
+.tab {
+    padding: 0.75rem 1.5rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    color: #64748b;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -2px;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.tab:hover {
+    color: #3b82f6;
+}
+
+.tab.active {
+    color: #3b82f6;
+    border-bottom-color: #3b82f6;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+    animation: fadeIn 0.3s;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.report-section {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    margin-bottom: 2rem;
+}
+
+.report-section h3 {
+    font-size: 1.25rem;
+    color: #1e293b;
+    margin-bottom: 1.5rem;
+}
+
+.report-filters {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.filter-group {
+    flex: 1;
+    min-width: 200px;
+}
+
+.filter-group label {
+    display: block;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.filter-group select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 0.95rem;
+}
+
+.filter-group select:focus {
+    outline: none;
+    border-color: #3b82f6;
+}
+
+.download-buttons {
+    display: flex;
+    gap: 1rem;
+}
+
+.download-btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.download-btn.pdf {
+    background: #dc2626;
+    color: white;
+}
+
+.download-btn.pdf:hover {
+    background: #b91c1c;
+}
+
+.download-btn.csv {
+    background: #10b981;
+    color: white;
+}
+
+.download-btn.csv:hover {
+    background: #059669;
+}
+
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+.summary-card {
+    background: #f9fafb;
+    padding: 1.5rem;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.summary-card h4 {
+    font-size: 0.9rem;
+    color: #64748b;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.summary-card .number {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.summary-card.blue .number { color: #3b82f6; }
+.summary-card.green .number { color: #10b981; }
+.summary-card.orange .number { color: #f97316; }
+.summary-card.purple .number { color: #a855f7; }
+
+.notifications-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.create-notice-btn {
+    padding: 0.75rem 1.5rem;
+    background: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: background 0.2s;
+}
+
+.create-notice-btn:hover {
+    background: #2563eb;
+}
+
+.data-table {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th {
+    background: #f9fafb;
+    padding: 1rem;
+    text-align: left;
+    font-weight: 600;
+    color: #374151;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+td {
+    padding: 1rem;
+    border-bottom: 1px solid #e5e7eb;
+    color: #1e293b;
+}
+
+tr:hover {
+    background: #f9fafb;
+}
+
+tr:last-child td {
+    border-bottom: none;
+}
+
+.audience-badge {
+    display: inline-block;
+    padding: 0.35rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.audience-badge.all { background: #dbeafe; color: #3b82f6; }
+.audience-badge.student { background: #d1fae5; color: #10b981; }
+.audience-badge.faculty { background: #e9d5ff; color: #a855f7; }
+
+.delete-btn {
+    padding: 0.5rem 0.75rem;
+    background: #fee2e2;
+    color: #dc2626;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.delete-btn:hover {
+    background: #fecaca;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal.active {
+    display: flex;
+}
+
+.modal-content {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    max-width: 500px;
+    width: 90%;
+}
+
+.modal-content h3 {
+    margin-bottom: 1.5rem;
+    color: #1e293b;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: #374151;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 0.95rem;
+}
+
+.form-group textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.modal-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+}
+
+.cancel-btn {
+    padding: 0.75rem 1.5rem;
+    background: #f3f4f6;
+    color: #374151;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.cancel-btn:hover {
+    background: #e5e7eb;
+}
+
+.submit-btn {
+    padding: 0.75rem 1.5rem;
+    background: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.submit-btn:hover {
+    background: #2563eb;
+}
+
+@media (max-width: 768px) {
+    .report-filters {
+        flex-direction: column;
+    }
+    .download-buttons {
+        flex-direction: column;
+    }
+    table {
+        font-size: 0.85rem;
+    }
+}
+</style>
+
+<div class="page-header">
+    <h1>Reports & Notifications</h1>
+    <p>Generate attendance reports and manage notifications</p>
+</div>
+
+<div class="tabs">
+    <button class="tab active" onclick="showTab(event, 'reports')">
+        <i class="fas fa-chart-bar"></i> Reports
+    </button>
+    <button class="tab" onclick="showTab(event, 'notifications')">
+        <i class="fas fa-bell"></i> Notifications
+    </button>
+</div>
+
+<div id="reports" class="tab-content active">
+    <div class="report-section">
+        <h3>Attendance Reports</h3>
+        
+        <div class="report-filters">
+            <div class="filter-group">
+                <label for="reportClass">Select Class</label>
+                <select id="reportClass">
+                    <option value="all">All Classes</option>
+                    <option value="CS-A">CS-A</option>
+                    <option value="CS-B">CS-B</option>
+                    <option value="IT-A">IT-A</option>
+                    <option value="CS-C">CS-C</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label for="reportMonth">Select Month</label>
+                <select id="reportMonth">
+                    <option value="2025-10" selected>October 2025</option>
+                    <option value="2025-09">September 2025</option>
+                    <option value="2025-08">August 2025</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="download-buttons">
+    <a href="{{ url_for('download_pdf') }}" class="download-btn pdf" style="text-decoration: none; display: inline-block;">
+        <i class="fas fa-file-pdf"></i> Download as PDF
+    </a>
+    <a href="{{ url_for('download_csv') }}" class="download-btn csv" style="text-decoration: none; display: inline-block;">
+        <i class="fas fa-file-csv"></i> Download as CSV
+    </a>
+</div>
+
+        
+        <div class="summary-grid">
+            <div class="summary-card blue">
+                <h4>Total Classes</h4>
+                <div class="number">{{ total_classes }}</div>
+            </div>
+            
+            <div class="summary-card green">
+                <h4>Avg Attendance</h4>
+                <div class="number">{{ avg_attendance }}%</div>
+            </div>
+            
+            <div class="summary-card orange">
+                <h4>Below 75%</h4>
+                <div class="number">{{ below_75 }}</div>
+            </div>
+            
+            <div class="summary-card purple">
+                <h4>Perfect Attendance</h4>
+                <div class="number">{{ perfect_attendance }}</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="notifications" class="tab-content">
+    <div class="notifications-header">
+        <h2 style="margin: 0; color: #1e293b; font-size: 1.5rem;">Manage Notifications</h2>
+        <button class="create-notice-btn" onclick="openModal()">
+            <i class="fas fa-plus"></i> Create Notice
+        </button>
+    </div>
+    
+    <div class="data-table">
+        <table>
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Content</th>
+                    <th>Date</th>
+                    <th>Audience</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if notices %}
+                    {% for notice in notices %}
+                    <tr>
+                        <td><strong>{{ notice.title }}</strong></td>
+                        <td>{{ notice.content[:50] }}{% if notice.content|length > 50 %}...{% endif %}</td>
+                        <td>{{ notice.created_at }}</td>
+                        <td>
+                            <span class="audience-badge {{ notice.author.lower() }}">{{ notice.author }}</span>
+                        </td>
+                        <td>
+                            <form method="POST" action="{{ url_for('delete_notice', notice_id=notice.id) }}" style="display: inline;">
+                                <button type="submit" class="delete-btn" onclick="return confirm('Are you sure you want to delete this notice?')">
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="5" style="text-align: center; color: #64748b; padding: 2rem;">
+                            No notifications found
+                        </td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div id="noticeModal" class="modal">
+    <div class="modal-content">
+        <h3>Create New Notice</h3>
+        <form method="POST" action="{{ url_for('create_notice') }}">
+            <div class="form-group">
+                <label for="noticeTitle">Title</label>
+                <input type="text" id="noticeTitle" name="title" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="noticeContent">Content</label>
+                <textarea id="noticeContent" name="content" required></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="noticeAudience">Audience</label>
+                <select id="noticeAudience" name="audience">
+                    <option value="All">All</option>
+                    <option value="Student">Student</option>
+                    <option value="Faculty">Faculty</option>
+                </select>
+            </div>
+            
+            <div class="modal-buttons">
+                <button type="button" class="cancel-btn" onclick="closeModal()">Cancel</button>
+                <button type="submit" class="submit-btn">Create Notice</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function showTab(event, tabName) {
+    const tabContents = document.querySelectorAll('.tab-content');
+    tabContents.forEach(content => {
+        content.classList.remove('active');
+    });
+    const tabs = document.querySelectorAll('.tab');
+    tabs.forEach(tab => {
+        tab.classList.remove('active');
+    });
+    document.getElementById(tabName).classList.add('active');
+    event.currentTarget.classList.add('active');
+}
+
+function openModal() {
+    document.getElementById('noticeModal').classList.add('active');
+}
+
+function closeModal() {
+    document.getElementById('noticeModal').classList.remove('active');
+}
+
+document.getElementById('noticeModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeModal();
+    }
+});
+
+</script>
+
+{% endblock %}

@@ -1,0 +1,313 @@
+{% extends "admin_layout.html" %}
+{% block title %}User & Student Management{% endblock %}
+
+{% block content %}
+<style>
+    body {
+        font-family: 'Inter', sans-serif;
+        background-color: #f1f5f9;
+        color: #1e293b;
+    }
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #e0e7ff;
+        border-radius: 0.5rem;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 4px rgba(99, 102, 241, 0.15);
+    }
+    .add-user-btn {
+        background: linear-gradient(to right, #4f46e5, #6366f1);
+        color: #fff;
+        padding: 0.75rem 1.5rem;
+        border-radius: 0.5rem;
+        text-decoration: none;
+        font-weight: 600;
+        box-shadow: 0 2px 6px rgba(99, 102, 241, 0.15);
+        transition: background 0.2s;
+    }
+    .tabs {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+    .tab {
+        background-color: #fff;
+        padding: 0.75rem 2rem;
+        cursor: pointer;
+        border: none;
+        border-radius: 0.5rem;
+        font-weight: 600;
+        color: #4f46e5;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        transition: background 0.2s;
+    }
+    .tab.active {
+        background-color: #6366f1;
+        color: #fff;
+        box-shadow: 0 4px 8px rgba(99, 102, 241, 0.1);
+    }
+    .tab-content {
+        display: none;
+        animation: fadein .3s;
+    }
+    .tab-content.active {
+        display: block;
+    }
+    @keyframes fadein {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    .search-bar {
+        margin-bottom: 1.5rem;
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+    }
+    .search-bar input {
+        padding: 0.5rem 1rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 0.35rem;
+        font-size: 1rem;
+        background: #fff;
+        color: #1e293b;
+    }
+    .data-table table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        background: #fff;
+        border-radius: 1rem;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        overflow: hidden;
+    }
+    .data-table th, .data-table td {
+        padding: 1rem 1.25rem;
+        text-align: left;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    .data-table th {
+        font-weight: 600;
+        color: #4f46e5;
+        background: #f1f5f9;
+    }
+    .data-table tr:last-child td {
+        border-bottom: none;
+    }
+    .attendance-pill {
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-weight: 600;
+        display: inline-block;
+    }
+    .attendance-pill.high { background-color: #d1fae5; color: #065f46; }
+    .attendance-pill.medium { background-color: #fef3c7; color: #92400e; }
+    .attendance-pill.low { background-color: #fee2e2; color: #991b1b; }
+    .action-buttons .icon-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 0.5rem;
+        margin-right: 0.25rem;
+        font-size: 1.1rem;
+        color: #1e293b;
+        transition: color 0.2s;
+    }
+    .action-buttons .icon-btn.delete { color: #ef4444; }
+    .action-buttons .icon-btn:hover { color: #6366f1; }
+</style>
+
+<div class="page-header">
+    <div>
+        <h1>User & Student Management</h1>
+        <p>Manage all users, students, and faculty members</p>
+    </div>
+    <a href="{{ url_for('add_user') }}" class="add-user-btn">
+        <i class="fas fa-plus"></i> Add New User
+    </a>
+</div>
+
+<div class="tabs">
+    <button class="tab active" onclick="showTab(event, 'students')">Students</button>
+    <button class="tab" onclick="showTab(event, 'faculty')">Faculty</button>
+    <button class="tab" onclick="showTab(event, 'all')">All Users</button>
+</div>
+
+<div id="students" class="tab-content active">
+    <h2 style="margin-bottom: 1.5rem; color: #1e293b; font-size: 1.25rem;">Student Management</h2>
+    <div class="search-bar">
+        <input type="text" placeholder="Search students..." id="studentSearch">
+    </div>
+    <div class="data-table">
+        <table>
+            <thead>
+                <tr>
+                    <th>Roll No</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Attendance</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="studentTableBody">
+                {% if students %}
+                    {% for student in students %}
+                    <tr>
+                        <td><strong>{{ student.roll_no }}</strong></td>
+                        <td>{{ student.name }}</td>
+                        <td>{{ student.email }}</td>
+                        <td>
+                            <span class="attendance-pill {% if student.attendance >= 75 %}high{% elif student.attendance >= 50 %}medium{% else %}low{% endif %}">
+                                {{ student.attendance }}%
+                            </span>
+                        </td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="icon-btn" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <form method="POST" action="{{ url_for('delete_user', user_id=student.id) }}" style="display: inline;">
+                                    <button type="submit" class="icon-btn delete" title="Delete" onclick="return confirm('Are you sure you want to delete this student?')">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="5" style="text-align: center; color: #64748b; padding: 2rem;">
+                            No students found
+                        </td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div id="faculty" class="tab-content">
+    <h2 style="margin-bottom: 1.5rem; color: #1e293b; font-size: 1.25rem;">Faculty Management</h2>
+    <div class="data-table">
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Subject</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if faculty %}
+                    {% for f in faculty %}
+                    <tr>
+                        <td><strong>{{ f.full_name }}</strong></td>
+                        <td>{{ f.email }}</td>
+                        <td>{{ f.subject or 'N/A' }}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="icon-btn" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <form method="POST" action="{{ url_for('delete_user', user_id=f.id) }}" style="display: inline;">
+                                    <button type="submit" class="icon-btn delete" title="Delete" onclick="return confirm('Are you sure you want to delete this faculty member?')">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="4" style="text-align: center; color: #64748b; padding: 2rem;">
+                            No faculty members found
+                        </td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div id="all" class="tab-content">
+    <h2 style="margin-bottom: 1.5rem; color: #1e293b; font-size: 1.25rem;">All Users</h2>
+    <div class="data-table">
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if users %}
+                    {% for user in users %}
+                    <tr>
+                        <td><strong>{{ user.full_name }}</strong></td>
+                        <td>{{ user.email }}</td>
+                        <td>{{ user.role }}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="icon-btn" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <form method="POST" action="{{ url_for('delete_user', user_id=user.id) }}" style="display: inline;">
+                                    <button type="submit" class="icon-btn delete" title="Delete" onclick="return confirm('Are you sure you want to delete this user?')">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="4" style="text-align: center; color: #64748b; padding: 2rem;">
+                            No users found
+                        </td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+function showTab(event, tabName) {
+    const tabContents = document.querySelectorAll('.tab-content');
+    tabContents.forEach(content => {
+        content.classList.remove('active');
+    });
+    const tabs = document.querySelectorAll('.tab');
+    tabs.forEach(tab => {
+        tab.classList.remove('active');
+    });
+    document.getElementById(tabName).classList.add('active');
+    event.currentTarget.classList.add('active');
+}
+
+const searchInput = document.getElementById('studentSearch');
+
+function filterStudents() {
+    const searchTerm = searchInput.value.toLowerCase();
+    const rows = document.querySelectorAll('#studentTableBody tr');
+
+    rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        const matchesSearch = text.includes(searchTerm);
+        row.style.display = matchesSearch ? '' : 'none';
+    });
+}
+
+if (searchInput) {
+    searchInput.addEventListener('input', filterStudents);
+}
+</script>
+{% endblock %}

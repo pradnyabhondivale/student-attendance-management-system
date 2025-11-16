@@ -1,0 +1,81 @@
+/* === ADMIN-SPECIFIC STYLES === */
+
+/* Role-specific status tags for admin tables */
+.status.admin { background-color: #e0e7ff; color: #4338ca; }
+.status.student { background-color: #d1fae5; color: #065f46; }
+.status.faculty { background-color: #fef3c7; color: #92400e; }
+
+/* Action buttons in tables */
+.action-buttons {
+    display: flex;
+    gap: 0.5rem;
+}
+.btn-action {
+    padding: 0.5rem;
+    border-radius: var(--border-radius-md);
+    border: none;
+    cursor: pointer;
+    transition: var(--transition);
+    font-size: 1.1rem; /* Slightly larger icon */
+    line-height: 1;
+    display: grid;
+    place-items: center;
+}
+.btn-action.edit { background-color: #dbeafe; color: #1e40af; }
+.btn-action.edit:hover { background-color: #bfdbfe; }
+.btn-action.delete { background-color: #fee2e2; color: #991b1b; }
+.btn-action.delete:hover { background-color: #fecaca; }
+
+/* Modal styles for Add/Edit forms */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(30, 41, 59, 0.5); /* Darker backdrop */
+    backdrop-filter: blur(5px);
+}
+.modal-content {
+    background-color: var(--surface-color);
+    margin: 8% auto;
+    padding: 1.5rem;
+    border: 1px solid var(--border-color);
+    width: 90%;
+    max-width: 500px;
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-lg);
+    animation: slide-down 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+@keyframes slide-down {
+    from { transform: translateY(-30px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 1rem;
+    margin-bottom: 1.5rem;
+}
+.modal-header h3 { margin-bottom: 0; }
+.close-btn {
+    color: var(--text-secondary);
+    font-size: 1.75rem;
+    font-weight: bold;
+    cursor: pointer;
+    line-height: 1;
+    transition: var(--transition);
+}
+.close-btn:hover { color: var(--text-primary); transform: rotate(90deg); }
+
+.modal-footer {
+    margin-top: 1.5rem;
+    border-top: 1px solid var(--border-color);
+    padding-top: 1.5rem;
+    text-align: right;
+}

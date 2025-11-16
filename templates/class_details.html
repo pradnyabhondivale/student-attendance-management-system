@@ -1,0 +1,79 @@
+{% extends "admin_layout.html" %}
+{% block title %}Class Details{% endblock %}
+{% block content %}
+<style>
+body { background: #f5f7fb; }
+.page-area {
+  max-width: 1080px; margin: 18px auto 0 auto; background: transparent;
+}
+#main-title {
+  font-size: 2.08rem; font-weight: 900; letter-spacing:-0.02em;
+  color: #253365; font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+  margin-bottom: 0.2rem; line-height:1.13;
+}
+.subject-line {
+  font-size: 1.13rem;
+  font-weight: 700;
+  color: #4f46e5;
+  margin-bottom: 0.24rem;
+  margin-left: 2px;
+  font-family: inherit;
+}
+.back-link {
+  color: #285ef7; text-decoration: underline; font-weight: 500;
+  margin-bottom: .44rem; display: inline-block;
+  font-size: 0.98rem;
+}
+.table-wrap {
+  margin-top: 0.82rem; background: #fff; border-radius: 1.09rem;
+  box-shadow: 0 2px 14px rgba(70,80,185,0.06); overflow-x: auto;
+  padding: 0 0 14px 0;
+}
+.details-table {
+  width: 100%; border-collapse: collapse; font-size: 0.98rem;
+}
+.details-table th, .details-table td {
+  padding: 0.46rem 0.72rem;
+  border-bottom: 1px solid #e6e8ef;
+  text-align: left;
+  vertical-align: middle;
+  font-size: 1.01rem;
+}
+.details-table th {
+  font-weight: 700;
+  background: #f5f7fc;
+  color: #3b49b1;
+  letter-spacing: 0.03em;
+  font-size: 1.03rem;
+}
+.details-table tr:last-child td { border-bottom: none; }
+</style>
+<div class="page-area">
+  <div id="main-title">Class Details</div>
+  <div class="subject-line">{{ class_name }} &#8212; {{ subject }}</div>
+  <a href="{{ url_for('admin_classes') }}" class="back-link">&larr; Back to Classes Overview</a>
+
+  <div class="table-wrap">
+    <table class="details-table">
+      <thead>
+        <tr>
+          <th>Student Name</th>
+          <th>Roll No</th>
+          <th>Status</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for student in students %}
+        <tr>
+          <td>{{ student.full_name or student.student_name }}</td>
+          <td>{{ student.roll_number or student.roll_no }}</td>
+          <td>{{ student.status }}</td>
+          <td>{{ student.date }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

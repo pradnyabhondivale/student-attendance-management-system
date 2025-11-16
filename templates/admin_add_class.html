@@ -1,0 +1,84 @@
+{% extends "admin_layout.html" %}
+{% block title %}Add New Class{% endblock %}
+
+{% block content %}
+<style>
+    .form-container {
+        max-width: 450px;
+        margin: 2rem auto;
+        background: #fff;
+        padding: 2rem 2.5rem;
+        border-radius: 1.1rem;
+        box-shadow: 0 2px 8px rgba(99, 102, 241, 0.1);
+    }
+    .form-container h2 {
+        font-size: 1.25rem;
+        margin-bottom: 1.5rem;
+        font-weight: 600;
+        color: #1e293b;
+        text-align: center;
+    }
+    .form-group {
+        margin-bottom: 1.2rem;
+    }
+    .form-group label {
+        display: block;
+        margin-bottom: 0.3rem;
+        color: #374151;
+        font-weight: 500;
+    }
+    .form-group input,
+    .form-group select {
+        width: 100%;
+        padding: 0.55rem 1rem;
+        border: 1px solid #e5e7eb;
+        border-radius: 0.4rem;
+        font-size: 1rem;
+        background: #f9fafb;
+    }
+    .btn-primary {
+        background: linear-gradient(90deg, #4f46e5, #6366f1);
+        border: none;
+        color: #fff;
+        padding: 0.7rem 2.2rem;
+        border-radius: 0.4rem;
+        font-weight: 600;
+        font-size: 1rem;
+        margin-top: 0.7rem;
+        cursor: pointer;
+        box-shadow: 0 2px 4px rgba(99, 102, 241, 0.09);
+    }
+    .btn-primary:hover {
+        background: linear-gradient(90deg, #6366f1, #4f46e5);
+    }
+    .back-link {
+        display: inline-block;
+        margin-top: 1.7rem;
+        color: #2563eb;
+        text-decoration: underline;
+        font-weight: 500;
+        text-align: center;
+        width: 100%;
+    }
+</style>
+
+<div class="form-container">
+    <h2>Add New Class</h2>
+    <form method="POST" action="{{ url_for('add_class') }}">
+        <div class="form-group">
+            <label for="class_name">Class Name</label>
+            <input type="text" name="class_name" id="class_name" required placeholder="e.g. SE COMP-A">
+        </div>
+        <div class="form-group">
+            <label for="subject">Subject</label>
+            <input type="text" name="subject" id="subject" required placeholder="e.g. Data Structures">
+        </div>
+        <div class="form-group">
+            <label for="faculty">Faculty Name</label>
+            <input type="text" name="faculty" id="faculty" required placeholder="e.g. Dr. Rajesh Patil">
+        </div>
+        <button type="submit" class="btn-primary">Add Class</button>
+    </form>
+    <a href="{{ url_for('admin_classes') }}" class="back-link">&#8592; Back to Classes Overview</a>
+</div>
+{% endblock %}

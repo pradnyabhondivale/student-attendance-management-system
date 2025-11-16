@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}AttendEase{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f7fa; }
+        .admin-navbar { background: #1e293b; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .admin-navbar-brand { color: white; font-size: 1.5rem; font-weight: 700; text-decoration: none; display: flex; align-items: center; gap: 0.5rem; }
+        .admin-navbar-menu { display: flex; gap: 2rem; align-items: center; }
+        .admin-navbar-menu a { color: white; text-decoration: none; font-weight: 500; transition: color 0.2s; }
+        .admin-navbar-menu a:hover { color: #3b82f6; }
+        .admin-user-info { display: flex; align-items: center; gap: 1rem; color: white; padding-left: 1.5rem; border-left: 1px solid rgba(255,255,255,0.3); }
+        .admin-user-role { background: #3b82f6; padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.85rem; }
+        .admin-main { padding: 2rem; min-height: calc(100vh - 70px); }
+        .flash-message { padding: 1rem; border-radius: 8px; margin-bottom: 0.5rem; }
+        .flash-message.success { background: #d1fae5; color: #065f46; border-left: 4px solid #10b981; }
+        .flash-message.error { background: #fee2e2; color: #991b1b; border-left: 4px solid #dc2626; }
+    </style>
+</head>
+<body>
+    <nav class="admin-navbar">
+        <a href="{{ url_for('index') }}" class="admin-navbar-brand">
+            <i class="fas fa-graduation-cap"></i> AttendEase
+        </a>
+        <div class="admin-navbar-menu">
+            <a href="{{ url_for('admin_dashboard') }}"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a href="{{ url_for('admin_users') }}"><i class="fas fa-users"></i> Users</a>
+            <a href="{{ url_for('admin_classes') }}"><i class="fas fa-book"></i> Classes</a>
+            <a href="{{ url_for('admin_reports') }}"><i class="fas fa-chart-bar"></i> Reports</a>
+            <div class="admin-user-info">
+                <span>{{ session.user_name }}</span>
+                <span class="admin-user-role">Admin</span>
+                <a href="{{ url_for('logout') }}" style="color: #f87171;"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="admin-main">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash-message {{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>

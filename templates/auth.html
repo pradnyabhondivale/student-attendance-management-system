@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to AttendEase</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+</head>
+<body>
+    <div class="background-shapes">
+        <div class="shape shape1"></div>
+        <div class="shape shape2"></div>
+        <div class="shape shape3"></div>
+        <div class="shape shape4"></div>
+    </div>
+
+    <div class="main-container">
+        <!-- Promo Panel on the Left -->
+        <div class="promo-panel">
+            <div class="promo-content">
+                <!-- UPDATED: Using Font Awesome Graduation Cap Icon -->
+                <i class="fas fa-graduation-cap" style="font-size: 5rem; color: white; margin-bottom: 1rem;"></i>
+                <h1>AttendEase</h1>
+                <p>Streamline your attendance process with an intuitive, powerful, and modern system.</p>
+            </div>
+        </div>
+       
+        <!-- Form Panel on the Right (with Glass Effect) -->
+        <div class="form-panel">
+            <div class="form-container">
+                <!-- LOGIN FORM - ROLE SELECTOR REMOVED FOR SECURITY -->
+                <form id="login-form" class="form active" action="{{ url_for('login') }}" method="POST">
+                    <div class="form-header">
+                        <h2>Welcome Back</h2>
+                        <p>Login to continue your journey.</p>
+                    </div>
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="flash-message {{ category }}">{{ message }}</div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+                    <div class="input-group">
+                        <input type="email" id="login-email" name="email" required>
+                        <label for="login-email">Email Address</label>
+                    </div>
+                    <div class="input-group">
+                        <input type="password" id="login-password" name="password" required>
+                        <label for="login-password">Password</label>
+                        <span class="toggle-password" data-target="login-password">SHOW</span>
+                    </div>
+                    <!-- REMOVED ROLE SELECTOR - Role comes from database now -->
+                    <button type="submit" class="btn-submit">Login</button>
+                    <p class="form-toggle-text">Don't have an account? <a href="#" id="show-signup">Sign Up</a></p>
+                </form>
+
+                <!-- SIGNUP FORM -->
+                <form id="signup-form" class="form" action="{{ url_for('signup') }}" method="POST">
+                    <div class="form-header">
+                        <h2>Create Account</h2>
+                        <p>Join our community in a few easy steps.</p>
+                    </div>
+                    <div class="input-group">
+                        <input type="text" id="signup-name" name="full_name" required>
+                        <label for="signup-name">Full Name</label>
+                    </div>
+                    <div class="input-group">
+                        <input type="email" id="signup-email" name="email" required>
+                        <label for="signup-email">Email Address</label>
+                    </div>
+                    <div class="input-group">
+                        <input type="password" id="signup-password" name="password" required>
+                        <label for="signup-password">Password</label>
+                        <span class="toggle-password" data-target="signup-password">SHOW</span>
+                    </div>
+                    <div class="input-group">
+                        <select id="signup-role" name="role" required>
+                            <option value="student">Register as a Student</option>
+                            <option value="faculty">Register as a Faculty</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn-submit">Create Account</button>
+                    <p class="form-toggle-text">Already have an account? <a href="#" id="show-login">Login</a></p>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+</body>
+</html>

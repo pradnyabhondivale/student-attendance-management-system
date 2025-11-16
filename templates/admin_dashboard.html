@@ -1,0 +1,376 @@
+{% extends "admin_layout.html" %}
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<style>
+.admin-header {
+    margin-bottom: 2rem;
+}
+
+.admin-header h1 {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    color: #1e293b;
+}
+
+.admin-header p {
+    color: #64748b;
+    font-size: 1rem;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: transform 0.2s;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.stat-info h3 {
+    font-size: 0.9rem;
+    color: #64748b;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.stat-info .stat-number {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+    color: #1e293b;
+}
+
+.stat-change {
+    font-size: 0.85rem;
+    color: #10b981;
+    font-weight: 500;
+}
+
+.stat-icon {
+    width: 65px;
+    height: 65px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.75rem;
+}
+
+.stat-icon.blue { background: #dbeafe; color: #3b82f6; }
+.stat-icon.green { background: #d1fae5; color: #10b981; }
+.stat-icon.purple { background: #e9d5ff; color: #a855f7; }
+.stat-icon.orange { background: #fed7aa; color: #f97316; }
+
+.chart-section {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    margin-bottom: 2rem;
+}
+
+.chart-section h2 {
+    font-size: 1.25rem;
+    margin-bottom: 1.5rem;
+    color: #1e293b;
+    font-weight: 600;
+}
+
+.two-column-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.section-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.section-card h2 {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+    color: #1e293b;
+    font-weight: 600;
+}
+
+.student-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.student-item:last-child {
+    border-bottom: none;
+}
+
+.student-info h4 {
+    margin: 0;
+    font-size: 1rem;
+    color: #1e293b;
+    font-weight: 600;
+}
+
+.student-info p {
+    margin: 0.25rem 0 0 0;
+    font-size: 0.85rem;
+    color: #64748b;
+}
+
+.attendance-badge {
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.attendance-badge.high { background: #d1fae5; color: #10b981; }
+.attendance-badge.medium { background: #fed7aa; color: #f97316; }
+.attendance-badge.low { background: #fecaca; color: #dc2626; }
+
+.class-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.class-item:last-child {
+    border-bottom: none;
+}
+
+.class-item h4 {
+    margin: 0;
+    font-size: 1rem;
+    color: #1e293b;
+    font-weight: 600;
+}
+
+.class-item p {
+    margin: 0.25rem 0 0 0;
+    font-size: 0.85rem;
+    color: #64748b;
+}
+
+.quick-actions {
+    margin-top: 1.5rem;
+}
+
+.action-btn {
+    display: block;
+    width: 100%;
+    padding: 0.875rem;
+    margin-bottom: 0.75rem;
+    border: none;
+    border-radius: 8px;
+    background: #3b82f6;
+    color: white;
+    cursor: pointer;
+    font-size: 0.95rem;
+    text-decoration: none;
+    text-align: center;
+    font-weight: 500;
+    transition: background 0.2s;
+}
+
+.action-btn:hover {
+    background: #2563eb;
+    color: white;
+}
+
+.action-btn.secondary {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+.action-btn.secondary:hover {
+    background: #e5e7eb;
+}
+
+@media (max-width: 768px) {
+    .two-column-grid {
+        grid-template-columns: 1fr;
+    }
+    .stat-number {
+        font-size: 2rem !important;
+    }
+}
+</style>
+
+<div class="admin-header">
+    <h1>Admin Dashboard</h1>
+    <p>Welcome back! Here's what's happening today.</p>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-info">
+            <h3>Total Students</h3>
+            <div class="stat-number">{{ total_students }}</div>
+            <div class="stat-change">+12% from last month</div>
+        </div>
+        <div class="stat-icon blue">
+            <i class="fas fa-user-graduate"></i>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-info">
+            <h3>Total Faculty</h3>
+            <div class="stat-number">{{ total_faculty }}</div>
+            <div class="stat-change">+3% from last month</div>
+        </div>
+        <div class="stat-icon green">
+            <i class="fas fa-chalkboard-teacher"></i>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-info">
+            <h3>Total Classes</h3>
+            <div class="stat-number">{{ total_classes }}</div>
+            <div class="stat-change">+9% from last month</div>
+        </div>
+        <div class="stat-icon purple">
+            <i class="fas fa-book"></i>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-info">
+            <h3>Overall Attendance</h3>
+            <div class="stat-number">{{ overall_attendance }}%</div>
+            <div class="stat-change">+2% from last month</div>
+        </div>
+        <div class="stat-icon orange">
+            <i class="fas fa-chart-line"></i>
+        </div>
+    </div>
+</div>
+
+<div class="chart-section">
+    <h2>Monthly Attendance Trend</h2>
+    <canvas id="attendanceChart" width="400" height="100"></canvas>
+</div>
+
+<div class="two-column-grid">
+    <div class="section-card">
+        <h2>Recent Students</h2>
+        {% if recent_students %}
+            {% for student in recent_students %}
+            <div class="student-item">
+                <div class="student-info">
+                    <h4>{{ student.name }}</h4>
+                    <p>{{ student.class }}</p>
+                </div>
+                <div class="attendance-badge {% if student.attendance >= 75 %}high{% elif student.attendance >= 50 %}medium{% else %}low{% endif %}">
+                    {{ student.attendance }}% Attendance
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <p style="color: #64748b; padding: 1rem 0;">No students found</p>
+        {% endif %}
+    </div>
+
+    <div class="section-card">
+        <h2>Classes Overview</h2>
+        {% if classes_overview %}
+            {% for class in classes_overview %}
+            <div class="class-item">
+                <div>
+                    <h4>{{ class.class_name }}</h4>
+                    <p>Computer Science</p>
+                </div>
+                <div style="font-weight: 600; color: #3b82f6;">{{ class.student_count }} Students</div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <p style="color: #64748b; padding: 1rem 0;">No classes found</p>
+        {% endif %}
+
+        <div class="quick-actions">
+            <a href="{{ url_for('admin_users') }}" class="action-btn">
+                <i class="fas fa-plus"></i> Add New Student
+            </a>
+            <a href="{{ url_for('admin_reports') }}" class="action-btn secondary">
+                <i class="fas fa-chart-bar"></i> View Reports
+            </a>
+            <a href="{{ url_for('admin_classes') }}" class="action-btn secondary">
+                <i class="fas fa-cog"></i> Manage Classes
+            </a>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const monthlyData = {{ monthly_trend | safe }};
+const ctx = document.getElementById('attendanceChart').getContext('2d');
+new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: monthlyData.map(d => d.month),
+        datasets: [{
+            label: 'Attendance %',
+            data: monthlyData.map(d => d.percentage),
+            borderColor: '#3b82f6',
+            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+            tension: 0.4,
+            fill: true,
+            pointBackgroundColor: '#3b82f6',
+            pointBorderColor: '#fff',
+            pointBorderWidth: 2,
+            pointRadius: 4
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+            legend: { display: false },
+            tooltip: {
+                callbacks: {
+                    label: function(context) {
+                        return 'Attendance: ' + context.parsed.y + '%';
+                    }
+                }
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                max: 100,
+                ticks: {
+                    callback: function(value) {
+                        return value + '%';
+                    }
+                }
+            }
+        }
+    }
+});
+</script>
+
+{% endblock %}

@@ -1,0 +1,310 @@
+{% extends "faculty_layout.html" %}
+{% block title %}Faculty Dashboard - AttendEase{% endblock %}
+
+{% block content %}
+<style>
+    .dashboard-header {
+        margin-bottom: 1.5rem;
+    }
+    
+    .dashboard-header h1 {
+        font-size: 2rem;
+        color: #1e293b;
+        margin-bottom: 0.25rem;
+    }
+    
+    .dashboard-header p {
+        color: #64748b;
+        font-size: 0.95rem;
+        margin: 0;
+    }
+    
+    .subject-badge {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        padding: 0.35rem 0.9rem;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.8rem;
+        display: inline-block;
+        margin-top: 0.5rem;
+    }
+    
+    .grid-4 {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .stat-card {
+        background: white;
+        padding: 1rem;
+        border-radius: 10px;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+    }
+    
+    .stat-label {
+        font-size: 0.75rem;
+        color: #64748b;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .stat-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #1e293b;
+    }
+    
+    .stat-value.blue { color: #3b82f6; }
+    .stat-value.green { color: #10b981; }
+    .stat-value.red { color: #ef4444; }
+    .stat-value.purple { color: #8b5cf6; }
+    
+    .card {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+        padding: 1.25rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .card h2 {
+        font-size: 1.1rem;
+        color: #1e293b;
+        margin-bottom: 1rem;
+        margin-top: 0;
+    }
+    
+    .schedule-item {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem;
+        border-radius: 8px;
+        background: #f9fafb;
+        margin-bottom: 0.75rem;
+        border-left: 3px solid #667eea;
+    }
+    
+    .schedule-time {
+        font-size: 0.8rem;
+        color: #64748b;
+        font-weight: 600;
+        min-width: 140px;
+    }
+    
+    .schedule-info {
+        flex: 1;
+        margin: 0 0.75rem;
+    }
+    
+    .schedule-class {
+        font-weight: 600;
+        color: #1e293b;
+        font-size: 0.9rem;
+    }
+    
+    .schedule-subject {
+        font-size: 0.8rem;
+        color: #64748b;
+        margin-top: 0.2rem;
+    }
+    
+    .status-badge {
+        padding: 0.3rem 0.75rem;
+        border-radius: 15px;
+        font-weight: 600;
+        font-size: 0.75rem;
+        white-space: nowrap;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .status-completed {
+        background: #d1fae5;
+        color: #065f46;
+    }
+    
+    .status-upcoming {
+        background: #fef3c7;
+        color: #92400e;
+    }
+    
+    .status-in-progress {
+        background: #dbeafe;
+        color: #0c4a6e;
+        animation: pulse 2s infinite;
+    }
+    
+    .status-pending {
+        background: #f3e8ff;
+        color: #6b21a8;
+    }
+    
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.7; }
+    }
+    
+    .no-classes {
+        text-align: center;
+        padding: 1.5rem;
+        color: #94a3b8;
+        font-size: 0.9rem;
+    }
+    
+    .no-classes i {
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+        opacity: 0.5;
+    }
+    
+    .notice-item {
+        background: #f9fafb;
+        padding: 0.875rem;
+        border-radius: 8px;
+        margin-bottom: 0.75rem;
+        border-left: 3px solid #667eea;
+    }
+    
+    .notice-title {
+        font-weight: 600;
+        color: #1e293b;
+        margin-bottom: 0.3rem;
+        font-size: 0.95rem;
+    }
+    
+    .notice-content {
+        font-size: 0.85rem;
+        color: #64748b;
+        margin-bottom: 0.3rem;
+    }
+    
+    .notice-author {
+        font-size: 0.75rem;
+        color: #94a3b8;
+    }
+    
+    .grid-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    @media (max-width: 1024px) {
+        .grid-2 {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="dashboard-header">
+    <h1>Welcome, {{ session['user_name'] }}!</h1>
+    <p>{{ current_date }}</p>
+    <div class="subject-badge">{{ faculty_subject }}</div>
+</div>
+<div class="subject-badge">
+    Subjects: {{ faculty_subjects }}
+</div>
+
+
+<!-- Stats Grid -->
+<div class="grid-4">
+    <div class="stat-card">
+        <div class="stat-label">Total Students</div>
+        <div class="stat-value blue">{{ total_students }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Today's Classes</div>
+        <div class="stat-value green">{{ todays_classes }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Pending</div>
+        <div class="stat-value red">{{ attendance_pending }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Marked Today</div>
+        <div class="stat-value purple">{{ completed_today }}</div>
+    </div>
+</div>
+
+<div class="grid-2">
+    <!-- Today's Classes (Combined from Weekly) -->
+    <div class="card">
+        <h2>📅 Today's Schedule</h2>
+        
+        {% if todays_schedule|length > 0 %}
+            {% for schedule in todays_schedule %}
+            <div class="schedule-item">
+                <div class="schedule-time">{{ schedule.time }}</div>
+                <div class="schedule-info">
+                    <div class="schedule-class">{{ schedule.class_name }}</div>
+                    <div class="schedule-subject">{{ schedule.subject }}</div>
+                </div>
+                <div class="status-badge {% if schedule.status == 'Completed' %}status-completed{% elif schedule.status == 'In Progress' %}status-in-progress{% elif schedule.status == 'Pending' %}status-pending{% else %}status-upcoming{% endif %}">
+                    {{ schedule.status }}
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+        <div class="no-classes">
+            <i class="fas fa-calendar-check"></i>
+            <p>No classes scheduled for today</p>
+        </div>
+        {% endif %}
+    </div>
+    
+    <!-- Weekly Overview -->
+    <div class="card">
+        <h2>📋 Weekly Schedule</h2>
+        
+        {% if weekly_schedule|length > 0 %}
+            {% for schedule in weekly_schedule %}
+            <div class="schedule-item">
+                <div class="schedule-time">{{ schedule.day_short }}<br>{{ schedule.time_short }}</div>
+                <div class="schedule-info">
+                    <div class="schedule-class">{{ schedule.class_name }}</div>
+                    <div class="schedule-subject">{{ schedule.subject }}</div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+        <div class="no-classes">
+            <i class="fas fa-calendar-times"></i>
+            <p>No scheduled classes</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Recent Notices -->
+<div class="card">
+    <h2>📢 Recent Notices</h2>
+    
+    {% if notices|length > 0 %}
+        {% for notice in notices %}
+        <div class="notice-item">
+            <div class="notice-title">{{ notice.title }}</div>
+            <div class="notice-content">{{ notice.content }}</div>
+            <div class="notice-author">{{ notice.author }}</div>
+        </div>
+        {% endfor %}
+    {% else %}
+    <div class="no-classes">
+        <i class="fas fa-info-circle"></i>
+        <p>No notices available</p>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+    // Refresh page every 5 minutes
+    setTimeout(function() {
+        location.reload();
+    }, 5 * 60 * 1000);
+</script>
+{% endblock %}

@@ -1,0 +1,159 @@
+{% extends "admin_layout.html" %}
+{% block title %}Add New User{% endblock %}
+
+{% block content %}
+<div style="max-width: 700px; margin: 0 auto;">
+    <!-- Back Button -->
+    <div style="margin-bottom: 2rem;">
+        <a href="{{ url_for('admin_users') }}" style="color: #3b82f6; text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; border-radius: 8px; transition: background 0.2s;">
+            <i class="fas fa-arrow-left"></i> Back to Users
+        </a>
+    </div>
+
+    <!-- Main Card -->
+    <div style="background: white; padding: 2.5rem; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+        <!-- Header -->
+        <div style="text-align: center; margin-bottom: 2.5rem; padding-bottom: 2rem; border-bottom: 2px solid #f1f5f9;">
+            <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #3b82f6, #2563eb); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+                <i class="fas fa-user-plus" style="color: white; font-size: 2rem;"></i>
+            </div>
+            <h1 style="margin-bottom: 0.5rem; font-size: 2rem; color: #1e293b;">Add New User</h1>
+            <p style="color: #64748b; font-size: 1rem;">Create a new student or faculty account</p>
+        </div>
+
+        <!-- Form -->
+        <form method="POST" action="{{ url_for('add_user') }}">
+            <!-- Full Name -->
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem; font-size: 0.95rem;">
+                    <i class="fas fa-user" style="color: #3b82f6; margin-right: 0.5rem;"></i> Full Name
+                </label>
+                <input type="text" name="full_name" required placeholder="Enter full name"
+                       style="width: 100%; padding: 0.875rem 1rem; border: 2px solid #e5e7eb; border-radius: 10px; font-size: 0.95rem; background: #f8fafc; transition: all 0.2s;"
+                       onfocus="this.style.borderColor='#3b82f6'; this.style.background='white';"
+                       onblur="this.style.borderColor='#e5e7eb'; this.style.background='#f8fafc';">
+            </div>
+
+            <!-- Email Address -->
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem; font-size: 0.95rem;">
+                    <i class="fas fa-envelope" style="color: #3b82f6; margin-right: 0.5rem;"></i> Email Address
+                </label>
+                <input type="email" name="email" required placeholder="user@example.com"
+                       style="width: 100%; padding: 0.875rem 1rem; border: 2px solid #e5e7eb; border-radius: 10px; font-size: 0.95rem; background: #f8fafc; transition: all 0.2s;"
+                       onfocus="this.style.borderColor='#3b82f6'; this.style.background='white';"
+                       onblur="this.style.borderColor='#e5e7eb'; this.style.background='#f8fafc';">
+            </div>
+
+            <!-- Password -->
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem; font-size: 0.95rem;">
+                    <i class="fas fa-lock" style="color: #3b82f6; margin-right: 0.5rem;"></i> Password
+                </label>
+                <input type="password" name="password" required placeholder="Enter password"
+                       style="width: 100%; padding: 0.875rem 1rem; border: 2px solid #e5e7eb; border-radius: 10px; font-size: 0.95rem; background: #f8fafc; transition: all 0.2s;"
+                       onfocus="this.style.borderColor='#3b82f6'; this.style.background='white';"
+                       onblur="this.style.borderColor='#e5e7eb'; this.style.background='#f8fafc';">
+            </div>
+
+            <!-- Role Selection -->
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem; font-size: 0.95rem;">
+                    <i class="fas fa-user-tag" style="color: #3b82f6; margin-right: 0.5rem;"></i> Role
+                </label>
+                <select name="role" id="roleSelect" required onchange="toggleStudentFields()"
+                        style="width: 100%; padding: 0.875rem 1rem; border: 2px solid #e5e7eb; border-radius: 10px; background: #f8fafc; font-size: 0.95rem; cursor: pointer; transition: all 0.2s;"
+                        onfocus="this.style.borderColor='#3b82f6'; this.style.background='white';"
+                        onblur="this.style.borderColor='#e5e7eb'; this.style.background='#f8fafc';">
+                    <option value="">-- Select Role --</option>
+                    <option value="student">👨‍🎓 Student</option>
+                    <option value="faculty">👨‍🏫 Faculty</option>
+                </select>
+            </div>
+
+            <!-- Student-Specific Fields (Hidden by default) -->
+            <div id="studentFields" style="display: none; background: #f8fafc; padding: 1.5rem; border-radius: 12px; margin-bottom: 1.5rem; border-left: 4px solid #3b82f6;">
+                <h3 style="color: #1e293b; font-size: 1rem; margin-bottom: 1rem; font-weight: 600;">
+                    <i class="fas fa-graduation-cap" style="color: #3b82f6;"></i> Student Information
+                </h3>
+                
+                <!-- Class Dropdown -->
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem; font-size: 0.9rem;">
+                        <i class="fas fa-book" style="color: #3b82f6; margin-right: 0.5rem;"></i> Class Name
+                    </label>
+                    <select name="class_name" id="classSelect"
+                            style="width: 100%; padding: 0.875rem 1rem; border: 2px solid #e5e7eb; border-radius: 10px; background: white; font-size: 0.95rem; cursor: pointer;">
+                        <option value="">-- Select Class --</option>
+                        <option value="CS-A">CS-A (Computer Science - Section A)</option>
+                        <option value="CS-B">CS-B (Computer Science - Section B)</option>
+                        <option value="CS-C">CS-C (Computer Science - Section C)</option>
+                        <option value="IT-A">IT-A (Information Technology - Section A)</option>
+                        <option value="IT-B">IT-B (Information Technology - Section B)</option>
+                        <option value="EC-A">EC-A (Electronics - Section A)</option>
+                        <option value="ME-A">ME-A (Mechanical Engineering - Section A)</option>
+                    </select>
+                </div>
+
+                <!-- Roll Number -->
+                <div style="margin-bottom: 0;">
+                    <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem; font-size: 0.9rem;">
+                        <i class="fas fa-hashtag" style="color: #3b82f6; margin-right: 0.5rem;"></i> Roll Number
+                    </label>
+                    <input type="text" name="roll_number" id="rollNumber" placeholder="e.g., 2024001"
+                           style="width: 100%; padding: 0.875rem 1rem; border: 2px solid #e5e7eb; border-radius: 10px; font-size: 0.95rem; background: white;">
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div style="display: flex; gap: 1rem; margin-top: 2rem; padding-top: 2rem; border-top: 2px solid #f1f5f9;">
+                <button type="submit" 
+                        style="flex: 1; padding: 1rem 1.5rem; background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 1rem; transition: all 0.3s; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);"
+                        onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(59, 130, 246, 0.4)';"
+                        onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(59, 130, 246, 0.3)';">
+                    <i class="fas fa-check-circle"></i> Create User
+                </button>
+                <a href="{{ url_for('admin_users') }}" 
+                   style="flex: 1; padding: 1rem 1.5rem; background: #f1f5f9; color: #64748b; border: 2px solid #e5e7eb; border-radius: 10px; text-decoration: none; text-align: center; font-weight: 600; font-size: 1rem; transition: all 0.2s; display: flex; align-items: center; justify-content: center;"
+                   onmouseover="this.style.background='#e5e7eb'; this.style.borderColor='#cbd5e1';"
+                   onmouseout="this.style.background='#f1f5f9'; this.style.borderColor='#e5e7eb';">
+                    <i class="fas fa-times-circle"></i> Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function toggleStudentFields() {
+    const role = document.getElementById('roleSelect').value;
+    const studentFields = document.getElementById('studentFields');
+    const classSelect = document.getElementById('classSelect');
+    const rollNumber = document.getElementById('rollNumber');
+    
+    if (role === 'student') {
+        studentFields.style.display = 'block';
+        classSelect.required = true;
+        rollNumber.required = true;
+    } else {
+        studentFields.style.display = 'none';
+        classSelect.required = false;
+        rollNumber.required = false;
+        classSelect.value = '';
+        rollNumber.value = '';
+    }
+}
+</script>
+
+<style>
+/* Input focus effects */
+input:focus, select:focus {
+    outline: none;
+}
+
+/* Smooth transitions */
+* {
+    transition: all 0.2s ease;
+}
+</style>
+{% endblock %}

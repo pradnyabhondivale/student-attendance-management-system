@@ -1,0 +1,187 @@
+{% extends "admin_layout.html" %}
+{% block title %}Class & Attendance Overview{% endblock %}
+{% block content %}
+<style>
+body { background: #f7f8fc;}
+.wrap-main { max-width: 1160px; margin: 36px auto 0 auto;}
+.dash-header {
+    background: #e6eaff;
+    border-radius: 1.3rem;
+    padding: 1.45rem 2.1rem 0.9rem 2.3rem;
+    box-shadow: 0 4px 24px #cbd5e11a;
+    margin-bottom: 1.45rem;
+    display: flex; flex-direction:column; gap:0.22rem;
+}
+#main-title {
+    font-size: 1.39rem;
+    font-weight: 750;
+    color: #2b388d;
+    font-family: 'Inter', Arial, sans-serif;
+    letter-spacing: 0.01em;
+}
+.dash-header-desc {
+    color: #465980; font-size: .99rem;
+    margin-bottom: .07rem;
+    font-family: inherit; font-weight: 500;
+}
+.section-title {
+    font-size: .99rem;
+    font-weight: 600;
+    color: #3755da;
+    margin: 1.1rem 0 .14rem 0;
+    border-left: 2.5px solid #6d7ffd;
+    padding-left: .7rem;
+    letter-spacing: 0.04em;
+    background: transparent;
+}
+.table-section {
+    background: #fff; border-radius: 1.12rem;
+    box-shadow: 0 1.5px 8px #acc7ef17;
+    padding: 0.05rem 0 0.07rem 0;
+    margin-bottom: 1.2rem;
+}
+.admin-table {
+    width: 100%; border-collapse: collapse; font-size: 0.95rem; font-weight:500; background: #fff;}
+.admin-table th, .admin-table td {
+    padding: 0.37rem 0.77rem; text-align: left;
+    border-bottom: 1px solid #f1f4fc;
+    font-size: .97rem;
+}
+.admin-table th {
+    font-weight: 600; color: #2431ac; font-size: .97rem;
+    background: #f3f5ff;
+    letter-spacing: .012em;
+}
+.admin-table tr:last-child td { border-bottom: none;}
+.view-btn {
+    background: #5b6dfb; color: #fff; font-weight: 500; border:none;
+    border-radius: .28rem; padding: 0.21rem 0.92rem;
+    font-size: .96rem; margin-top: 2px;
+    text-decoration: none; transition: background .14s;
+    box-shadow: 0 1px 2px #b5c2ff12;
+    outline:none;
+}
+.view-btn:hover, .export-btn:hover { background: #393eae; color: #fff;}
+.export-btn {
+    background: #e0e7ff; color: #233196; border-radius:.23rem;
+    font-size:.96rem; border:none; font-weight:500;
+    padding: 0.21rem 0.88rem; cursor:pointer;
+    margin-left:.06rem; margin-bottom:.21rem;
+    transition:.11s background; text-decoration:none; outline:none;
+    box-shadow:0 1px 3px #bdcbff1b;
+}
+select {
+    border-radius:.21rem;
+    border: 1px solid #bccafd;
+    font-size: .97rem;
+    padding: 0.19rem 0.77rem;
+    background: #f8faff;
+    color: #2431ac;
+    font-weight: 500;
+}
+.bar {
+    display:flex;align-items:center;gap:.36rem;margin-bottom:0.44rem;margin-top:.07rem;
+}
+@media (max-width:920px) {
+    .wrap-main { max-width:99vw; padding:0 7px; }
+    .dash-header { padding: 1.13rem .7rem 0.88rem .87rem;}
+}
+</style>
+<div class="wrap-main">
+    <div class="dash-header">
+        <div id="main-title">Class & Attendance Overview</div>
+        <div class="dash-header-desc">
+            Manage all Classes and Student Attendance.
+        </div>
+    </div>
+    <div class="section-title">Classes Overview</div>
+    <div class="table-section">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Class Name</th>
+                    <th>Subject</th>
+                    <th>Faculty</th>
+                    <th>Total Students</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for c in classes %}
+                <tr>
+                    <td style="font-weight:600;color:#4051db;">{{ c.class_name }}</td>
+                    <td>{{ c.subject }}</td>
+                    <td>{{ c.faculty or 'None' }}</td>
+                    <td>{{ c.total_students }}</td>
+                    <td>
+                        <a href="{{ url_for('view_class', class_name=c.class_name, subject=c.subject) }}" class="view-btn">View</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="section-title">Attendance Overview</div>
+    <div class="bar">
+        <select id="classFilter">
+            <option value="">All Classes</option>
+            {% for class_name in class_list %}
+                <option value="{{ class_name }}">{{ class_name }}</option>
+            {% endfor %}
+        </select>
+        <a id="pdfExport" class="export-btn" target="_blank">Export PDF</a>
+        <a id="csvExport" class="export-btn" target="_blank">Export CSV</a>
+    </div>
+    <div class="table-section">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Student</th>
+                    <th>Class</th>
+                    <th>Roll</th>
+                    <th>Presents</th>
+                    <th>Absents</th>
+                    <th>%</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for a in attendance_records %}
+                <tr class="attendance-row" data-class="{{ a.class_name }}">
+                    <td>{{ a.student_name }}</td>
+                    <td>{{ a.class_name }}</td>
+                    <td>{{ a.roll_no }}</td>
+                    <td>{{ a.presents }}</td>
+                    <td>{{ a.absents }}</td>
+                    <td>{{ a.percentage }}%</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+<script>
+document.getElementById('classFilter').addEventListener('change', function() {
+    var selectedClass = this.value;
+    var rows = document.querySelectorAll('.attendance-row');
+    rows.forEach(function(row) {
+        row.style.display = (!selectedClass || row.getAttribute('data-class') === selectedClass) ? '' : 'none';
+    });
+    updateExportLinks();
+});
+function getSelectedClass() {
+    return document.getElementById('classFilter').value;
+}
+function updateExportLinks() {
+    let selectedClass = getSelectedClass();
+    let pdfUrl = "{{ url_for('download_pdf') }}";
+    let csvUrl = "{{ url_for('download_csv') }}";
+    if (selectedClass) {
+        pdfUrl += "?class=" + encodeURIComponent(selectedClass);
+        csvUrl += "?class=" + encodeURIComponent(selectedClass);
+    }
+    document.getElementById('pdfExport').href = pdfUrl;
+    document.getElementById('csvExport').href = csvUrl;
+}
+window.onload = updateExportLinks;
+</script>
+{% endblock %}
